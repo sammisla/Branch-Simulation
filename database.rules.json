@@ -1,0 +1,28 @@
+{
+  "rules": {
+    "games": {
+      "$code": {
+        ".read": "auth != null",
+        "owner": {
+          ".write": "auth != null && !data.exists() && newData.val() === auth.uid"
+        },
+        "config": {
+          ".write": "auth != null && data.parent().child('owner').val() === auth.uid"
+        },
+        "state": {
+          ".write": "auth != null && data.parent().child('owner').val() === auth.uid"
+        },
+        "players": {
+          "$uid": {
+            ".write": "auth != null && (auth.uid === $uid || data.parent().parent().child('owner').val() === auth.uid)",
+            "picks": {
+              "$r": {
+                ".validate": "root.child('games').child($code).child('state/phase').val() === 'open' && root.child('games').child($code).child('state/roundKey').val() === $r"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
